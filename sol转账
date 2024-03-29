@@ -1,0 +1,55 @@
+const Web3 = require('web3');
+
+// 连接到以太坊节点
+const web3 = new Web3('https://mainnet.infura.io/v3/your_infura_project_id');
+
+// 发送方地址和私钥
+const senderAddress = '0xYourSenderAddress';
+const privateKey = '0xYourPrivateKey';
+
+// 批量接收方地址和对应的转账金额（以wei为单位）
+const recipients = [
+    { address: '0xRecipientAddress1', amount: web3.utils.toWei('0.1', 'ether') },
+    { address: '0xRecipientAddress2', amount: web3.utils.toWei('0.2', 'ether') },
+    // 可以添加更多接收方地址和转账金额
+];
+
+// 获取交易nonce
+web3.eth.getTransactionCount(senderAddress, (err, nonce) => {
+    if (err) {
+        console.error('Error occurred while getting nonce:', err);
+        return;
+    }
+
+    // 构造交易
+    const txPromises = recipients.map(recipient => {
+        const tx = {
+            nonce: nonce,
+            to: recipient.address,
+            value: recipient.amount,
+            gas: 21000,
+            gasPrice: web3.utils.toWei('10', 'gwei'), // 可以根据需要设置gas价格
+        };
+        nonce++;
+
+        // 签名交易
+        return web3.eth.accounts.signTransaction(tx, privateKey);
+    });
+
+    // 发送交易
+    Promise.all(txPromises)
+        .then(signedTxs => {
+            signedTxs.forEach(signedTx => {
+                web3.eth.sendSignedTransaction(signedTx.rawTransaction)
+                    .on('transactionHash', hash => {
+                        console.log('Transaction hash:', hash);
+                    })
+                    .on('error', err => {
+                        console.error('Error occurred while sending transaction:', err);
+                    });
+            });
+        })
+        .catch(error => {
+            console.error('Error occurred:', error);
+        });
+});
