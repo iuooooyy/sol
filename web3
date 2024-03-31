@@ -1,0 +1,21 @@
+const Web3 = require('web3');
+
+// 连接到以太坊节点
+const web3 = new Web3('https://mainnet.infura.io/v3/your_infura_project_id');
+
+// 加载智能合约 ABI 和地址
+const contractABI = [ /* Your contract ABI */ ];
+const contractAddress = '0xContractAddress';
+
+// 实例化合约
+const contractInstance = new web3.eth.Contract(contractABI, contractAddress);
+
+// 调用智能合约方法
+contractInstance.methods.methodName(param1, param2, ...)  // 替换 methodName 和参数
+  .send({ from: '0xYourAddress', gas: 200000 })  // 设置发送账户和 gas 限额
+  .then(receipt => {
+    console.log('Transaction receipt:', receipt);
+  })
+  .catch(error => {
+    console.error('Error occurred:', error);
+  });
