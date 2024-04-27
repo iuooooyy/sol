@@ -1,0 +1,3 @@
+block_hash = rpc_connection.getbestblockhash()  # 获取最新区块的哈希
+block_info = rpc_connection.getblock(block_hash)  # 获取区块信息
+print("区块信息:", block_info)
